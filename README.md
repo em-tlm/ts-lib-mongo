@@ -10,13 +10,11 @@ when the connection fails after initial connection.
 ### Replication set
 
 ### Usage
-This is a proposed API interface, would love your feedback. 
 
 
 ```javascript
-const config = {}; 
-const conn = require('ts-lib-mongo')(config).mongoConnector;
-conn.mongoConnect().then(start);
+const mongoConnector = require('ts-lib-mongo').mongoConnector;
+mongoConnector.connect().then(start);
 
 function start(){
     // your code
@@ -24,7 +22,5 @@ function start(){
 }
 ```
 
-### todo:
-* All the functions will return promise.
-* Use bluebird as the mongoose promise lib. 
+### todo: 
 * Add more unit tests

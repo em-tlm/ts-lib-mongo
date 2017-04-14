@@ -1,6 +1,8 @@
 "use strict";
 
 const mongoose = require('mongoose');
+const Promise = require('bluebird');
+mongoose.Promise = Promise;
 const config = require('./config').mongoConfig;
 const logger = require('./utils/logger.js');
 const uri = config.uri;
@@ -8,7 +10,7 @@ const uri = config.uri;
 /**
  * The default connection retry is 30 (retry at once per second).
  * This is not enough, because the app will sometimes
- * lose mongo connection for longer than that.
+ * lose MongoDB connection for longer than that.
  * And if that happens, it won't try to reconnect anymore, leaving the app
  * in a defunct state.
  */
@@ -19,7 +21,7 @@ let rsOptions = {
     replset: {rs_name: config.rs_name, socketOptions: {connectTimeoutMS: 10000}},
     user: config.user,
     pass: config.pass,
-    auth: {authdb: "admin"}
+    auth: {authdb: 'admin'}
 };
 
 // single server configuration
@@ -35,38 +37,49 @@ let options = useOptions ? rsOptions : ssOptions;
  * Attach event listeners
  */
 mongoose.connection.on('connected', function () {
-    console.log('connected to mongo');
-    logger.notice(logger.types.MONGO_CONNECTED);
+    logger.info(logger.types.MONGO_CONNECTED);
 });
 
 mongoose.connection.on('error', function (err) {
-    console.error(err);
-    logger.error({
-        message: logger.types.MONGO_ERROR,
-        err: err.message,
-        full_message: err.stack
-    });
+    err.type = logger.types.MONGO_ERROR;
+    logger.error(err);
 });
 
 mongoose.connection.on('disconnected', function () {
-    console.log('mongo disconnected');
-    logger.notice(logger.types.MONGO_DISCONNECTED);
+    logger.info(logger.types.MONGO_DISCONNECTED);
 });
 
 /**
  * connect to mongodb
  */
-function mongoConnect() {
 
-    // retry the connection if it fails
-    mongoose.connect(uri, options, function (err) {
-        if (err) {
-            setTimeout(mongoConnect, 2000);
-        }
-    })
+function connect(){
+    // http://mongoosejs.com/docs/api.html#connection_Connection-readyState
+    // 0 = disconnected
+    // 1 = connected
+    // 2 = connecting
+    // 3 = disconnecting
+    const state =  mongoose.connection.readyState;
+
+    // if there is already a connection
+    // do not connect any more
+    if (state == 1){
+        return  Promise.resolve('');
+    }
+
+    // if there is an on-going connection
+    // retry the connection after 2 seconds
+    if (state == 2){
+        return Promise.delay(2000).then(connect);
+    }
+
+    return mongoose.connect(uri, options)
+        .catch(function(){
+            return Promise.delay(2000).then(connect);
+        });
 }
 
-module.exports.mongoConnect = mongoConnect;
-module.exports.mongoDisconnect = function () {
-    mongoose.disconnect();
+module.exports.connect = connect;
+module.exports.disconnect = function () {
+    return mongoose.disconnect();
 };

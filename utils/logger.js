@@ -15,7 +15,7 @@ if (config.graylogHost && config.graylogPort) {
     transport = 'console';
 }
 
-const logger = require('ts-logger')(transport, config);
+const logger = require('ts-lib-logger')(transport, config);
 logger.extendTypes(types);
 
 module.exports = logger;
