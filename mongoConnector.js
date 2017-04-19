@@ -64,12 +64,12 @@ function connect(){
     // if there is already a connection
     // do not connect any more
     if (state == 1){
-        return  Promise.resolve('');
+        return  Promise.resolve();
     }
 
-    // if there is an on-going connection
+    // if there is an on-going connection / disconnection
     // retry the connection after 2 seconds
-    if (state == 2){
+    if (state == 2 || state == 3){
         return Promise.delay(2000).then(connect);
     }
 
