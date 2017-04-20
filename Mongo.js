@@ -63,7 +63,7 @@ class Mongo{
             return Promise.delay(2000).then(this.connect.bind(this));
         }
 
-        return mongoose.connect(uri, options)
+        return mongoose.connect(uri, this.options)
             .catch(()=>{
                 return Promise.delay(2000).then(this.connect.bind(this));
             });
