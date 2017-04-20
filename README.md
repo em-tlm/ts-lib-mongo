@@ -11,6 +11,7 @@ This includes the scenarios
 
 
 ### Usage
+* Example usage of this library can be found at [ts-lib-mongo-example](https://github.com/tetrascience/ts-lib-mongo-example). 
 * Use library's default connection config. No need to pass anything to the constructor. 
 *This is the most common usage*, since the relevant MongoDB information should have been added to the container
 in the form of environmental variables. 
