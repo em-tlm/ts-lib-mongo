@@ -2,7 +2,8 @@
 
 const Mongo = require('../../index.js').Mongo;
 require('../../models/Driver.js');
-const mongoose = require('mongoose');
+//const mongoose = require('mongoose');
+const mongoose = require('/tetrascience/tsboss/node_modules/mongoose');
 const Driver = mongoose.model('Driver');
 const logger = require('../../utils/logger.js');
 

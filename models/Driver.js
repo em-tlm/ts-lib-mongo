@@ -1,4 +1,4 @@
-var mongoose = require('mongoose');
+const mongoose = require('/tetrascience/tsboss/node_modules/mongoose');
 
 var DriverSchema;
 DriverSchema = new mongoose.Schema({
