@@ -13,8 +13,9 @@ when the connection fails after initial connection.
 
 
 ```javascript
-const mongoConnector = require('ts-lib-mongo').mongoConnector;
-mongoConnector.connect().then(start);
+const Mongo = require('ts-lib-mongo').Mongo;
+const db = new Mongo(config);
+db.connect().then(start);
 
 function start(){
     // your code
@@ -24,3 +25,4 @@ function start(){
 
 ### todo: 
 * Add more unit tests
+* 
