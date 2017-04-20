@@ -8,8 +8,6 @@ This includes the scenarios
 * when the connection fails in the initial attempt 
 * when the connection fails after initial connection
 
-
-
 ### Usage
 * Example usage of this library can be found at [ts-lib-mongo-example](https://github.com/tetrascience/ts-lib-mongo-example). 
 * Use library's default connection config. No need to pass anything to the constructor. 
@@ -79,6 +77,9 @@ db.connect();
 db.connection.on('error', (e) => { console.error(e); });
 ```
 
+### Peer Dependency
+`mongoose` is added as a [peer dependency](https://nodejs.org/en/blog/npm/peer-dependencies/) in package.json. 
+This allows the application that uses this library to access the same mongoose object. 
 
 ### todo: 
 * Add more unit tests
