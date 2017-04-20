@@ -22,6 +22,6 @@
     "ts-lib-logger": "tetrascience/ts-lib-logger#docker"
   },
   "peerDependencies": {
-    "mongoose": "^4.9.4",
+    "mongoose": "^4.9.4"
   }
 }
