@@ -4,7 +4,7 @@ A client library to establish robust connection to MongoDB.
 
 ### Reconnection 
 This client will always try to reconnect to MongDB when there is error or disconnection. 
-This includes the scenarios 
+This includes the scenarios:
 * when the connection fails in the initial attempt 
 * when the connection fails after initial connection
 
@@ -42,7 +42,8 @@ module.exports = defaultConfig;
   * To connect to one single MongoDB server
     ```javascript
     const config = {
-       uri : 'mongodb://@localhost:27017/ts'
+       uri : 'mongodb://@localhost:27017/ts',
+       reconnectInterval: 1500
     };
     const Mongo = require('ts-lib-mongo').Mongo;
     const db = new Mongo(config);
@@ -83,5 +84,4 @@ db.connection.on('error', (e) => { console.error(e); });
 This allows the application that uses this library to access the same mongoose object. 
 
 ### todo: 
-* Add more unit tests
-* Add more instruction on how to use the 
+* Add more unit tests (question how to start and stop mongod?)
