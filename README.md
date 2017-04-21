@@ -21,25 +21,24 @@ db.connect().then(start);
 // a function that depends on mongo connection
 function start(){}
 ```
-The library uses the environmental variable as the config:
+The library uses the environmental variable as for the default uri and default options:
 ```javascript
-const config = {
-   uri : process.env.REPL_MONGO || 'mongodb://@localhost:27017/ts',
-   rs_name : process.env.REPL_NAME,
+const defaultOptions = {
+   replset: { rs_name : process.env.REPL_NAME },
    user : process.env.REPL_USER,
    pass : process.env.REPL_PWD
 };
+const defaultUri = process.env.REPL_MONGO || 'mongodb://@localhost:27017/ts';
+const defaultConfig = {
+    options: defaultOptions,
+    uri: defaultUri
+};
+module.exports = defaultConfig;
 ```
 
-* Pass in the connection configuration, this will overwrite the default config. 
-This library currently support the following 4 options in the configuration: 
-  * uri
-  * rs_name
-  * user
-  * pass  
-  
-To understand what those configuration options mean, refer to [mongoose documention](http://mongoosejs.com/docs/connections.html). 
-
+* Pass in your own uri and/or options, this will overwrite the default config. 
+(To understand the connection options (`config.options`), refer to [mongoose documention](http://mongoosejs.com/docs/connections.html)).
+ 
   * To connect to one single MongoDB server
     ```javascript
     const config = {
@@ -55,10 +54,12 @@ To understand what those configuration options mean, refer to [mongoose document
   * To connect to a MongoDB replication set 
     ```javascript
     const config = {
-       uri : 'mongodb://@localhost:27017/ts',
-       rs_name : 'mongodb://mongodb-mongo-cluster-1,mongodb-mongo-cluster-2,mongodb-mongo-cluster-3:27017/ts',
-       user : 'username',
-       pass : 'password'
+        uri: 'mongodb://@localhost:27017/ts',
+        options: {
+            replset: { rs_name : 'mongodb://mongodb-mongo-cluster-1,mongodb-mongo-cluster-2,mongodb-mongo-cluster-3:27017/ts' },
+            user : 'username',
+            pass : 'password'
+        }
     };
     const Mongo = require('ts-lib-mongo').Mongo;
     const db = new Mongo(config);

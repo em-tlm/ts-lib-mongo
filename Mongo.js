@@ -6,16 +6,13 @@ mongoose.Promise = Promise;
 const _ = require('lodash');
 const assert = require('assert');
 const config = require('./config').mongoConfig;
+const defaultUri = config.uri;
 
-const uri = config.uri;
-
-/**
- * The default connection retry is 30 (retry at once per second).
- * This is not enough, because the app will sometimes
- * lose MongoDB connection for longer than that.
- * And if that happens, it won't try to reconnect anymore, leaving the app
- * in a defunct state.
- */
+// The default connection retry is 30 (retry at once per second).
+// This is not enough, because the app will sometimes
+// lose MongoDB connection for longer than that.
+// If that happens, it won't try to reconnect anymore, leaving the app
+// in a defunct state. Thus use Number.MAX_VALUE as reconnectTries
 // replication set configuration
 const rsOptions = {
     db: {native_parser: true},
@@ -32,14 +29,26 @@ const ssOptions = {
 };
 
 // pick the right option
-const useOptions = config.rs_name;
-const options = useOptions ? rsOptions : ssOptions;
+const useRsOptions = config.rs_name;
+const defaultOptions = useRsOptions ? rsOptions : ssOptions;
 
+// construct the default config
+const defaultConfig = {
+    uri: defaultUri,
+    options: defaultOptions,
+    reconnectInterval: 2000
+};
 
 class Mongo{
     constructor(config) {
-        assert(_.isUndefined(config) || _.isObject(config), `must pass in an object as argument`);
-        this.options = config || options;
+        assert(_.isUndefined(config) || _.isObject(config), `argument is optional, but if used, must pass in an object as the argument`);
+        config = config || {};
+        this.options = config.options || defaultConfig.options;
+        this.uri = config.uri || defaultConfig.uri;
+
+        assert(_.isUndefined(config.reconnectInterval) || ( _.isNumber(config.reconnectInterval) && config.reconnectInterval > 100),
+            `reconnectionInterval, if used, should be a number greater than 100 (ms)`);
+        this.reconnectInterval = config.reconnectInterval || defaultConfig.reconnectInterval;
         this.connection = mongoose.connection;
     }
 
@@ -60,12 +69,12 @@ class Mongo{
         // if there is an on-going connection / disconnection
         // retry the connection after 2 seconds
         if (state == 2 || state == 3){
-            return Promise.delay(2000).then(this.connect.bind(this));
+            return Promise.delay(this.reconnectInterval).then(this.connect.bind(this));
         }
 
-        return mongoose.connect(uri, this.options)
+        return mongoose.connect(this.uri, this.options)
             .catch(()=>{
-                return Promise.delay(2000).then(this.connect.bind(this));
+                return Promise.delay(this.reconnectInterval).then(this.connect.bind(this));
             });
     }
 
