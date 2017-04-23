@@ -81,7 +81,7 @@ db.connection.on('error', (e) => { console.error(e); });
 
 ### Peer Dependency
 `mongoose` is added as a [peer dependency](https://nodejs.org/en/blog/npm/peer-dependencies/) in package.json. 
-This allows the application that uses this library to access the same mongoose object. 
+This allows the application that uses this library to access the same mongoose object used in this library. 
 
 ### todo: 
 * Add more unit tests (question how to start and stop mongod?)
