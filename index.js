@@ -1,5 +1,5 @@
 "use strict";
 
-const mongoConnector = require('./DBConnector.js');
+const Mongo = require('./Mongo.js');
 
-module.exports.mongoConnector = mongoConnector;
+module.exports.Mongo = Mongo;
