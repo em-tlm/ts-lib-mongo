@@ -1,24 +1,26 @@
 {
   "name": "ts-lib-mongo",
-  "version": "0.1.0",
-  "description": "TetraScience utility library for mongodb",
+  "version": "0.9.0",
+  "description": "A client library to establish robust connection to MongoDB",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test"
+    "test": ""
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tetrascience/ts-lib-mongo.git"
   },
-  "author": "TetraScience Developers",
+  "author": "TetraScience Developers (developers@tetrascience.com)",
   "bugs": {
     "url": "https://github.com/tetrascience/ts-lib-mongo/issues"
   },
-  "license": "UNLICENSED",
+  "license": "MIT",
   "homepage": "https://github.com/tetrascience/ts-lib-mongo#readme",
   "dependencies": {
     "bluebird": "^3.5.0",
-    "mongoose": "^4.9.4",
-    "ts-lib-logger": "tetrascience/ts-lib-logger#docker"
+    "lodash": "^4.17.4"
+  },
+  "peerDependencies": {
+    "mongoose": "^4.9.5"
   }
 }
