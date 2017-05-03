@@ -1,5 +1,5 @@
 "use strict";
 
-const Mongo = require('./Mongo.js');
+const MongoDB = require('./MongoDB.js');
 
-module.exports.Mongo = Mongo;
+module.exports.MongoDB = MongoDB;

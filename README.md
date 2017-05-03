@@ -14,8 +14,8 @@ This includes the scenarios:
 *This is the most common usage*, since the relevant MongoDB information should have been added to the container
 in the form of environmental variables. 
 ```javascript
-const Mongo = require('ts-lib-mongo').Mongo;
-const db = new Mongo();
+const MongoDB = require('ts-lib-mongo').MongoDB;
+const db = new MongoDB();
 db.connect().then(start);
 
 // a function that depends on mongo connection
@@ -45,7 +45,7 @@ module.exports = defaultConfig;
        uri : 'mongodb://@localhost:27017/ts',
        reconnectInterval: 1500
     };
-    const Mongo = require('ts-lib-mongo').Mongo;
+    const MongoDB = require('ts-lib-mongo').MongoDB;
     const db = new Mongo(config);
     db.connect().then(start);
     
@@ -62,8 +62,8 @@ module.exports = defaultConfig;
             pass : 'password'
         }
     };
-    const Mongo = require('ts-lib-mongo').Mongo;
-    const db = new Mongo(config);
+    const MongoDB = require('ts-lib-mongo').MongoDB;
+    const db = new MongoDB(config);
     db.connect().then(start);
     
     function start(){}
@@ -73,8 +73,8 @@ module.exports = defaultConfig;
 You can attach event listener to the MongoDB connection. 
 For a full list of events, refer to [mongoose documentation](http://mongoosejs.com/docs/api.html#connection_Connection). 
 ```javascript
-const Mongo = require('ts-lib-mongo').Mongo;
-const db = new Mongo();
+const MongoDB = require('ts-lib-mongo').MongoDB;
+const db = new MongoDB();
 db.connect();
 db.connection.on('error', (e) => { console.error(e); });
 ```
