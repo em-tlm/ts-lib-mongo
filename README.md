@@ -13,6 +13,7 @@ This includes the scenarios:
 * Use library's default connection config. No need to pass anything to the constructor. 
 *This is the most common usage*, since the relevant MongoDB information should have been added to the container
 in the form of environmental variables. 
+
 ```javascript
 const MongoDB = require('ts-lib-mongo').MongoDB;
 const db = new MongoDB();
@@ -21,6 +22,7 @@ db.connect().then(start);
 // a function that depends on mongo connection
 function start(){}
 ```
+
 The library uses the environmental variable as for the default uri and default options:
 ```javascript
 const defaultOptions = {
@@ -36,7 +38,7 @@ const defaultConfig = {
 module.exports = defaultConfig;
 ```
 
-* Pass in your own uri and/or options, this will overwrite the default config. 
+* Pass in your own `uri` and/or `options` and/or `reconnectInterval` (default is 2000 in ms), this will overwrite the default config. 
 (To understand the connection options (`config.options`), refer to [mongoose documention](http://mongoosejs.com/docs/connections.html)).
  
   * To connect to one single MongoDB server
