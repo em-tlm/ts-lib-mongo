@@ -57,7 +57,7 @@ module.exports = defaultConfig;
   * To connect to a MongoDB replication set 
     ```javascript
     const config = {
-        uri: 'mongodb://@localhost:27017/ts',
+        uri: 'mongodb://mongodb-mongo-cluster-1,mongodb-mongo-cluster-2,mongodb-mongo-cluster-3:27017/ts',
         options: {
             replset: { rs_name : 'mongodb://mongodb-mongo-cluster-1,mongodb-mongo-cluster-2,mongodb-mongo-cluster-3:27017/ts' },
             user : 'username',
