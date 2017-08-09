@@ -81,6 +81,7 @@ class Mongo {
     this.uri = config.uri;
     this.db = config.db;
     this.reconnectInterval = config.reconnectInterval;
+    this.connection = {}
   }
 
   connect() {
@@ -108,13 +109,15 @@ class Mongo {
       return Promise.delay(this.reconnectInterval).then(this.connect.bind(this));
     }
 
-    const conn = mongoose.createConnection(this.uri, this.options)
-      .catch(() => {
-        return Promise.delay(this.reconnectInterval).then(this.connect.bind(this));
-      });
+    const conn = mongoose.createConnection(this.uri, this.options);
+    console.log(typeof conn);
+      // .catch(() => {
+      //   return Promise.delay(this.reconnectInterval).then(this.connect.bind(this));
+      // });
 
     if (!connections[this.db]) {
       connections[this.db] = conn;
+      this.connection = conn;
     }
 
     return conn;
