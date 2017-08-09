@@ -1,45 +1,9 @@
-"use strict";
-
 const mongoose = require('mongoose');
 const Promise = require('bluebird');
-const _ = require('lodash');
-const assert = require('assert');
-const config = require('./config').mongoConfig;
 const Joi = require('joi');
 
-const {string, object, number} = Joi;
-const defaultUri = config.uri;
+const {string, number} = Joi;
 mongoose.Promise = Promise;
-// The default connection retry is 30 (retry at once per second).
-// This is not enough, because the app will sometimes
-// lose MongoDB connection for longer than that.
-// If that happens, it won't try to reconnect anymore, leaving the app
-// in a defunct state. Thus use Number.MAX_VALUE as reconnectTries
-// replication set configuration
-const rsOptions = {
-  db: {native_parser: true},
-  server: {poolSize: 5, socketOptions: {connectTimeoutMS: 10000}, reconnectTries: Number.MAX_VALUE},
-  replset: {rs_name: config.rs_name, socketOptions: {connectTimeoutMS: 10000}},
-  user: config.user,
-  pass: config.pass,
-  auth: {authdb: 'admin'}
-};
-
-// single server configuration
-const ssOptions = {
-  server: {reconnectTries: Number.MAX_VALUE}
-};
-
-// pick the right option
-const useRsOptions = config.rs_name;
-const defaultOptions = useRsOptions ? rsOptions : ssOptions;
-
-// construct the default config
-const defaultConfig = {
-  uri: defaultUri,
-  options: defaultOptions,
-  reconnectInterval: 2000
-};
 
 const optionSchema = Joi.object().keys({
   db: string().required(),
@@ -57,31 +21,12 @@ class Mongo {
   constructor(config) {
     config = Joi.attempt(config, optionSchema);
     this.options = {
-      db: {
-        native_parser: true
-      },
-      server: {
-        poolSize: 5,
-        socketOptions: {
-          connectTimeoutMS: 10000
-        },
-        reconnectTries: Number.MAX_VALUE
-      },
-      replset: {
-        socketOptions: {
-          connectTimeoutMS: 10000
-        }
-      },
-      user: config.user,
-      pass: config.pass,
-      auth: {
-        authdb: 'admin'
-      }
+      reconnectTries: Number.MAX_VALUE,
+      useMongoClient: true,
     };
     this.uri = config.uri;
     this.db = config.db;
     this.reconnectInterval = config.reconnectInterval;
-    this.connection = {}
   }
 
   connect() {
@@ -91,8 +36,9 @@ class Mongo {
     // 2 = connecting
     // 3 = disconnecting
     let state;
-    if (connections[this.db]) {
-      state = connections[this.db].readyState;
+    const existingConn = connections[this.db];
+    if (existingConn) {
+      state = existingConn.readyState;
     } else {
       state = 0;
     }
@@ -100,7 +46,8 @@ class Mongo {
     // if there is already a connection
     // do not connect any more
     if (state == 1) {
-      return Promise.resolve();
+      this.connection = existingConn;
+      return Promise.resolve(this.connection);
     }
 
     // if there is an on-going connection / disconnection
@@ -109,20 +56,21 @@ class Mongo {
       return Promise.delay(this.reconnectInterval).then(this.connect.bind(this));
     }
 
-    const conn = mongoose.createConnection(this.uri, this.options);
-    console.log(typeof conn);
-      // .catch(() => {
-      //   return Promise.delay(this.reconnectInterval).then(this.connect.bind(this));
-      // });
-
-    if (!connections[this.db]) {
-      connections[this.db] = conn;
-      this.connection = conn;
-    }
-
-    return conn;
+    // this is promise
+    return mongoose.createConnection(this.uri, this.options)
+      .then((conn) => {
+        if (!connections[this.db]) {
+          connections[this.db] = conn;
+          this.connection = conn;
+        };
+        return conn;
+      })
+      .catch(() => {
+        return Promise.delay(this.reconnectInterval).then(this.connect.bind(this));
+      });
   }
 
+  // this will disconnect all connections
   disconnect() {
     return mongoose.disconnect();
   }
