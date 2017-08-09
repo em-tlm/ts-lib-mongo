@@ -7,13 +7,21 @@ mongoose.Promise = Promise;
 
 const optionSchema = Joi.object().keys({
   db: string().required(),
-  uri: string().required(),
-  user: string(),
-  pass: string(),
+  uri: string(),
+  host: string().when('uri', {
+    is: string().required(),
+    otherwise: string().required(),
+  }),
+  username: string(),
+  password: string().when('username', {
+    is: string().required(),
+    then: string().required(),
+  }),
+  port: number().default(27017),
   reconnectInterval: number().min(100).default(2000),
 }).options({
   stripUnknown: true
-}).required();
+}).or('host', 'uri').required();
 
 const connections = {};
 
@@ -24,8 +32,23 @@ class Mongo {
       reconnectTries: Number.MAX_VALUE,
       useMongoClient: true,
     };
-    this.uri = config.uri;
+    this.host = config.host;
+    this.port = config.port;
     this.db = config.db;
+    this.username = config.username;
+    this.password = config.password;
+
+    if (config.uri) {
+      this.uri = config.uri;
+    } else {
+      let baseUrl = `${this.host}:${this.port}/${this.db}`;
+      if (this.username && this.password) {
+        this.uri = `mongodb://${this.username}:${this.password}@${baseUrl}`;
+      } else {
+        this.uri = `mongodb://${baseUrl}`;
+      }
+    }
+
     this.reconnectInterval = config.reconnectInterval;
   }
 
@@ -62,7 +85,7 @@ class Mongo {
         if (!connections[this.db]) {
           connections[this.db] = conn;
           this.connection = conn;
-        };
+        }
         return conn;
       })
       .catch(() => {
