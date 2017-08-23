@@ -1,22 +1,23 @@
-"use strict";
-
 const MongoDB = require('../index').MongoDB;
 const DriverSchema = require('../models/Driver');
 const logger = console;
 
 const db = new MongoDB({
-  uri: 'mongodb://localhost:27017/ts',
+  host: 'localhost',
   db: 'ts',
 });
 const db1 = new MongoDB({
-  uri: 'mongodb://localhost:27017/ts',
+  host: 'localhost',
   db: 'ts',
+});
+const db2 = new MongoDB({
+  uri: 'mongodb://localhost:27017/tss?connectTimeoutMS=300000',
+  db: 'tss',
 });
 
 
 // try to connect the second time
-setTimeout(function () {
-
+setTimeout(()=> {
   db1.connect()
     .then((conn) => {
       console.log('another connection');
@@ -24,11 +25,11 @@ setTimeout(function () {
     }).catch((e) => {
       console.error(e);
   });
-}, 5000);
+}, 2000);
 
 
 db.connect()
-  .then(function (conn) {
+  .then((conn) => {
     conn.on('connected', function () {
       logger.log('MONGO_CONNECTED');
     });
@@ -53,6 +54,11 @@ db.connect()
     }).catch(function (e) {
       console.error(e);
     });
-  }, function (e) {
-    console.error(e);
+  }, (err) => {
+    console.error(err);
+  });
+
+db2.connect()
+  .then((conn) => {
+    console.log('can connect using connection string');
   });

@@ -7,10 +7,12 @@ mongoose.Promise = Promise;
 
 const optionSchema = Joi.object().keys({
   db: string().required(),
-  host: string().when('uri', {
-    is: string().required(),
-    otherwise: string().required(),
+  uri: string().uri({
+    scheme: [
+      'mongodb'
+    ]
   }),
+  host: string(),
   replicationSet: string().when('host', {
       is: string().required().regex(/(.*)\,(.*)\,(.*)/),
       then: string().required(),
@@ -26,7 +28,7 @@ const optionSchema = Joi.object().keys({
   reconnectInterval: number().min(100).default(2000),
 }).options({
   stripUnknown: true
-}).or('host', 'uri').required();
+}).or('uri', 'host').required();
 
 const connections = {};
 
@@ -48,8 +50,13 @@ class Mongo {
     this.username = config.username;
     this.password = config.password;
 
+    // if there is a uri passed in, use that.
+    // assume the user has passed in all the options as query parameters in the uri
     if (config.uri) {
       this.uri = config.uri;
+      this.options = {
+        useMongoClient: true,
+      };
     } else {
       let baseUrl = `${this.host}:${this.port}/${this.db}`;
       if (this.username && this.password) {
