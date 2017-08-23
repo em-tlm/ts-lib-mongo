@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Promise = require('bluebird');
 const Joi = require('joi');
 
-const {string, number} = Joi;
+const {string, number, any } = Joi;
 mongoose.Promise = Promise;
 
 const optionSchema = Joi.object().keys({
