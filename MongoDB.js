@@ -7,11 +7,16 @@ mongoose.Promise = Promise;
 
 const optionSchema = Joi.object().keys({
   db: string().required(),
-  uri: string(),
   host: string().when('uri', {
     is: string().required(),
     otherwise: string().required(),
   }),
+  replicationSet: string().when('host', {
+      is: string().required().regex(/(.*)\,(.*)\,(.*)/),
+      then: string().required(),
+      otherwise: any().strip(),
+    }
+  ),
   username: string(),
   password: string().when('username', {
     is: string().required(),
@@ -31,7 +36,12 @@ class Mongo {
     this.options = {
       reconnectTries: Number.MAX_VALUE,
       useMongoClient: true,
+      connectTimeoutMS: 10000,
+      keepAlive: true,
     };
+    if (config.replicationSet) {
+      this.options.replicaSet = config.replicationSet;
+    }
     this.host = config.host;
     this.port = config.port;
     this.db = config.db;
