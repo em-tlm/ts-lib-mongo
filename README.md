@@ -67,11 +67,13 @@ db1.connect().then((conn)=> {
 ```
 
 ### Replication set
-If you would like to connect to a replication set, just use a different `host`. For example:
+If you would like to connect to a replication set, just use a different `host` and 
+add the `replicationSet` for the replication set's name. For example:
 ```javascript
 const config = {
     host: 'mongodb-mongo-cluster-1,mongodb-mongo-cluster-2,mongodb-mongo-cluster-3',
     db: 'ts',
+    replicationSet: 'ts',
 };
 const db = new MongoDB(config);
 db.connect().then(start);
@@ -81,12 +83,12 @@ function start(){}
 ```
 
 ### Connection string 
-You can also use an arbitrary [connection string](mongodb://db1.example.net,db2.example.net:2500/?replicaSet=test&connectTimeoutMS=300000).
-Be aware that there is no validation 
+You can also use an arbitrary [connection string](https://docs.mongodb.com/manual/reference/connection-string/).
+Be aware that the code does NOT validate or check connection string.
 
 ```javascript
 const config = {
-    uri: 'mongodb://mongodb-mongo-cluster-1,mongodb-mongo-cluster-2,mongodb-mongo-cluster-3:27017/ts?replicaSet=test&connectTimeoutMS=300000',
+    uri: 'mongodb://mongodb-mongo-cluster-1,mongodb-mongo-cluster-2,mongodb-mongo-cluster-3:27017/ts?replicaSet=ts&connectTimeoutMS=300000',
     db: 'ts',
 };
 const MongoDB = require('ts-lib-mongo').MongoDB;
@@ -97,7 +99,7 @@ db.connect().then(start);
 function start(){}
 ```
 > Make sure you use the same database in both `uri` and `db`, in this case they are both `ts`. 
-Currently this code does not check the consistency. 
+Currently the code does NOT check the consistency. 
 
 
 ## API
@@ -121,6 +123,8 @@ __Parameters__
   + `host`: _(optional)_ Hostname of the MongoDB server. Required if `uri` is missing.
   
   + `db`: The MongoDB database to connect to.
+  
+  + `replicationSet`: _(optional)_ The replication set name.
   
   + `username`: _(optional)_ Username to use to connect the particular database in MongoDB.
 
