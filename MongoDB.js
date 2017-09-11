@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Promise = require('bluebird');
 const Joi = require('joi');
 
-const {string, number, any } = Joi;
+const {string, number, any, func } = Joi;
 mongoose.Promise = Promise;
 
 const optionSchema = Joi.object().keys({
@@ -26,6 +26,7 @@ const optionSchema = Joi.object().keys({
   }),
   port: number().default(27017),
   reconnectInterval: number().min(100).default(2000),
+  onConnectionError: func(),
 }).options({
   stripUnknown: true
 }).or('uri', 'host').required();
@@ -50,6 +51,8 @@ class Mongo {
     this.username = config.username;
     this.password = config.password;
 
+
+
     // if there is a uri passed in, use that.
     // assume the user has passed in all the options as query parameters in the uri
     if (config.uri) {
@@ -67,6 +70,7 @@ class Mongo {
     }
 
     this.reconnectInterval = config.reconnectInterval;
+    this.onConnectionError = config.onConnectionError || (function() {});
   }
 
   connect() {
@@ -105,7 +109,8 @@ class Mongo {
         }
         return conn;
       })
-      .catch(() => {
+      .catch((e) => {
+        this.onConnectionError(e);
         return Promise.delay(this.reconnectInterval).then(this.connect.bind(this));
       });
   }
