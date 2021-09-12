@@ -38,9 +38,9 @@ class Mongo {
     config = Joi.attempt(config, optionSchema);
     this.options = {
       reconnectTries: Number.MAX_VALUE,
-      useMongoClient: true,
       connectTimeoutMS: 10000,
       keepAlive: true,
+      tlsInsecure: true
     };
     if (config.replicationSet) {
       this.options.replicaSet = config.replicationSet;
@@ -57,9 +57,7 @@ class Mongo {
     // assume the user has passed in all the options as query parameters in the uri
     if (config.uri) {
       this.uri = config.uri;
-      this.options = {
-        useMongoClient: true,
-      };
+      this.options = {};
     } else {
       let baseUrl = `${this.host}:${this.port}/${this.db}`;
       if (this.username && this.password) {
