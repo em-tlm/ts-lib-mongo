@@ -1,6 +1,6 @@
 {
   "name": "ts-lib-mongo",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "A client library to establish robust connection to MongoDB",
   "main": "index.js",
   "scripts": {
