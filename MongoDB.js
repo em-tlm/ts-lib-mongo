@@ -98,8 +98,8 @@ class Mongo {
       return Promise.delay(this.reconnectInterval).then(this.connect.bind(this));
     }
 
-    // this is promise
-    return mongoose.createConnection(this.uri, this.options)
+    return Promise.resolve()
+      .then(() => mongoose.createConnection(this.uri, this.options))
       .then((conn) => {
         if (!connections[this.db]) {
           connections[this.db] = conn;
